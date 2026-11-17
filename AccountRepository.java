@@ -81,7 +81,8 @@ public class AccountRepository {
         String id =  account.getId();
 
         accounts.remove(id); // حذف حساب
-        logger.log("DELETE success:" + id);
+        System.out.println("Delete successfull");
+        logger.log("DELETE success: " + id);
     }
 
 }
