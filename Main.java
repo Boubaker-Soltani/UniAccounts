@@ -1,80 +1,102 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main {
+
     public static void main(String[] args) {
-        // هنا استدعينا النسخة الوحيدة من سجل العمليات AuditLogger باستعمال نمط Singleton [3]
-        AuditLogger logger = AuditLogger.getInLogger(); // ارجاع النسخة المركزية من السجل [3]
 
-        // هنا استخدمت List و ArrayList لتخزين قائمة المستودع (Dépôt) [4]
-        List<StudentAccount> depot = new ArrayList<>();
+        // =================================================================
+        // Singelton التهيئة: الحصول على الكائنات المشتركة عبر نمط
+        // =================================================================
+        AccountRepository repository = AccountRepository.getRepository(); // استدعاء المستودع
+        AuditLogger logger = AuditLogger.getInLogger(); // استدعاء سجل التدقيق
 
-        System.out.println("=== DÉBUT DU PROGRAMME ===");
+        System.out.println("======================= UniAccounts ===========================\n");
+
+        // =================================================================
+        // [المهمة 1]: إنشاء حسابين لطالبين باستخدام نمط Builder
+        // =================================================================
+        System.out.println("--- [Task 1] Creating two student accounts ---");
+
+        // احمد بن علي(Ahmed ben ali) بناء حساب الطالب الأول
+        StudentAccount student1 = new StudentAccount.Builder("20260001", "Ahmed ben ali", "ahmed.ali@univ.dz")
+                .major("Informatique") // التخصص
+                .level("L3") // المستوى
+                .courses(List.of("Java", "Bases de donnees", "Systemes d'exploitation"))
+                .build(); // إنشاء الكائن النهائي
+
+        // مريم فرحات (Meriam ferhat) بناء حساب الطالب الثاني
+        StudentAccount student2 = new StudentAccount.Builder("20260002", "Meriam ferhat", "meryem.k@univ.dz")
+                .major("Mathematiques") // التخصص
+                .level("M1") // المستوى
+                .build(); // إنشاء الكائن النهائي
+
+        // =================================================================
+        // [المهام 2]: إضافة الحساب الأول والثاني الى المستودع
+        // =================================================================
+        System.out.println("--- [Tasks 2] Adding the accounts to repository ---");
+
+        repository.addAccount(student1); // اضافة الحساب الاول
+        repository.addAccount(student2); // اضافة الحساب الثاني
         System.out.println();
 
-        // 1. إنشاء حسابي طالبين باستعمال نمط الباني (Builder Pattern) المعرف في الملاحظات [1, 2]
-        // هنا استخدمنا Builder لفرض المعلومات الإجبارية وتحديد التخصص والمستوى [1, 2]
-        StudentAccount etudiant1 = new StudentAccount.Builder("E101", "Jean Dupont", "jean.dupont@email.com")
-                .major("Informatique") // تحديد التخصص [2]
-                .level("L1")          // تحديد المستوى الدراسي [2]
-                .build();             // بناء الحساب النهائي [2]
+        // =================================================================
+        // [المهمة 3] طباعة الطلبة المسجلين مباشرة بعد الإضافة
+        // =================================================================
+        System.out.println("--- [Task 3] Show registered Students currently in the repository ---");
 
-        StudentAccount etudiant2 = new StudentAccount.Builder("E102", "Marie Curie", "marie.curie@email.com")
-                .major("Mathématiques") // تحديد التخصص [2]
-                .level("L2")           // تحديد المستوى الدراسي [2]
-                .build();              // بناء الحساب النهائي [2]
-
-        // 2. تنفيذ عملية الإضافة مرتين (Ajout) وتسجيل كل عملية في السجل [3]
-        System.out.println("--- Execution des Ajouts ---");
-
-        depot.add(etudiant1);
-        logger.log("AJOUT : Étudiant (" + etudiant1.getId() + " - " + etudiant1.getFullName() + ") ajouté au dépôt."); // تسجيل عملية جديدة في السجل [3]
-        System.out.println("AJOUT : " + etudiant1.getFullName() + " ajouté avec succès.");
-
-        depot.add(etudiant2);
-        logger.log("AJOUT : Étudiant (" + etudiant2.getId() + " - " + etudiant2.getFullName() + ") ajouté au dépôt."); // تسجيل عملية جديدة في السجل [3]
-        System.out.println("AJOUT : " + etudiant2.getFullName() + " ajouté avec succès.");
+        // المرور على جميع الحسابات المخزنة في المستودع وطباعتها
+        for (StudentAccount student : repository.getAllAccounts())
+            System.out.println(student);
         System.out.println();
 
-        // 3. تنفيذ عملية التعديل (Modification) على الطالب الأول باستعمال Setter [1]
-        System.out.println("--- Execution de la Modification ---");
-        etudiant1.setMajor("Génie Logiciel"); // هنا استخدمت Setter لتعديل التخصص [1]
-        logger.log("MODIFICATION : Changement de filière pour l'étudiant " + etudiant1.getId() + " vers Génie Logiciel."); // تسجيل التعديل [3]
-        System.out.println("MODIFICATION : Filière de " + etudiant1.getFullName() + " mise à jour vers Génie Logiciel.");
+        // =================================================================
+        // [المهمة 4]: حذف الحساب الأول ثم الحساب الثاني
+        // =================================================================
+        System.out.println("--- [Tasks 4] Deleting the first account ---");
+
+        repository.deleteAccount(student1); // حذف الحساب الأول
         System.out.println();
 
-        // 4. تنفيذ عملية الحذف مرتين لنفس الحساب (E102) لإظهار رسالة الخطأ في المرة الثانية
-        System.out.println("--- Execution des Suppressions ---");
+        // =================================================================
+        // [المهمة 5]: إعادة تنفيذ عملية الإضافة مرتين مع تسجيل كل عملية
+        // =================================================================
 
-        // الحذف الأول: ينجح وتتم إزالته من المستودع
-        boolean supprime1 = depot.removeIf(e -> e.getId().equals("E102"));
-        if (supprime1) {
-            logger.log("SUPPRESSION : Compte étudiant E102 supprimé avec succès du dépôt."); // تسجيل الحذف الناجح [3]
-            System.out.println("SUPPRESSION : Compte E102 supprimé avec succès.");
-        }
+        System.out.println("--- [Task 5] Re-create secound account ---");
+        repository.addAccount(student2); // اعادة اضافة الطالب الثاني
 
-        // الحذف الثاني لنفس الحساب (E102): يفشل وتظهر رسالة الخطأ بالفرنسية
-        boolean supprime2 = depot.removeIf(e -> e.getId().equals("E102"));
-        if (!supprime2) {
-            String msgErreur = "ERREUR SUPPRESSION : Le compte E102 n'existe pas ou a déjà été supprimé !";
-            logger.log(msgErreur); // تسجيل محاولة الحذف الفاشلة في السجل [3]
-            System.out.println(msgErreur); // عرض رسالة الخطأ بالفرنسية
-        }
+        // =================================================================
+        // [المهمة 6]: إعادة تنفيذ عملية الحذف مرتين مع تسجيل كل عملية
+        // =================================================================
+        System.out.println("--- [Task 6] Re-running the delete operation twice on student 1 ---");
+
+        repository.deleteAccount(student1); // إعادة حذف الحساب الأول
         System.out.println();
 
-        // 5. عرض سجل العمليات كامل في نهاية البرنامج باستعمال showLogs() [3]
-        System.out.println("=== JOURNAL COMPLET DES OPÉRATIONS (AUDIT LOGS) ===");
-        logger.showLogs(); // عرض العمليات المسجلة بالوقت والتاريخ [3]
+        // =================================================================
+        // [المهمة 7]: تحديث معلومات حساب طالب
+        // =================================================================
+        System.out.println("--- [Task 7] Update Account 2 (add course) ---");
+
+        student2.addCourse("Algebre"); // إضافة مقرر للطالبة الثانية
+        repository.updateAccount(student2); // حفظ التحديث في المستودع
+        System.out.println();
+        
+        // =================================================================
+        // [المهمتان 8]: عرض ملعومات الطالب الثاني بعد التعديل
+        // =================================================================
+        System.out.println("--- [Task 8] Show Student 2 after update ---");
+        System.out.println(student2);
         System.out.println();
 
-        // 6. عرض محتوى المستودع الحالي (Dépôt)
-        System.out.println("=== CONTENU ACTUEL DU DÉPÔT ===");
-        if (depot.isEmpty()) {
-            System.out.println("Le dépôt est vide.");
-        } else {
-            for (StudentAccount st : depot) {
-                System.out.println(st); // عرض معلومات الحساب [1]
-            }
-        }
-        System.out.println();
+        // =================================================================
+        // [المهمتان 9]: عرض سجل العمليات التاريخي الشامل وتفقده
+        // =================================================================
+        System.out.println("--- [Tasks 8] Displaying the operations history ---");
 
-        System.out.println("=== FIN DU PROGRAMME ===");
+        // عرض السجل الذي يحتفظ بكافة الأحداث الناجحة والفاشلة بترتيبها الزمني
+        ArrayList<String> logs = logger.getAllLogs();
+        for (String log : logs)
+            System.out.println(log);
     }
 }
