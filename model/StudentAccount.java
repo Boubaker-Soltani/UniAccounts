@@ -1,3 +1,4 @@
+package model;
 import java.util.ArrayList;      //هنا استخدمت interface ArrayList 
 import java.util.List;     //interface List
 // Pattern: Builder & Prototype
