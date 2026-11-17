@@ -9,7 +9,7 @@ public class Main {
         AccountRepository repository = AccountRepository.getInstance(); // استدعاء المستودع
         AuditLogger logger = AuditLogger.getInstance();                 // استدعاء سجل التدقيق
 
-        System.out.println("==================================================");
+        
         System.out.println("      بدء تنفيذ قائمة المهام المطلوبة (TP1)       ");
         System.out.println("==================================================\n");
 
